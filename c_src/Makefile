@@ -1,5 +1,13 @@
 # Based on c_src.mk from erlang.mk by Loic Hoguin <essen@ninenines.eu>
 
+DTHREAD=../../dthread
+DTHREAD_DRV_OBJS = \
+                 $(DTHREAD)/c_src/$(TARGET)/dlib.o \
+                 $(DTHREAD)/c_src/$(TARGET)/dlog.o \
+                 $(DTHREAD)/c_src/$(TARGET)/dterm.o \
+                 $(DTHREAD)/c_src/$(TARGET)/dthread.o
+
+
 CURDIR := $(shell pwd)
 BASEDIR := $(abspath $(CURDIR)/..)
 
@@ -11,7 +19,7 @@ ERL_INTERFACE_INCLUDE_DIR ?= $(shell erl -noshell -s init stop -eval "io:format(
 ERL_INTERFACE_LIB_DIR ?= $(shell erl -noshell -s init stop -eval "io:format(\"~s\", [code:lib_dir(erl_interface, lib)]).")
 
 C_SRC_DIR = $(CURDIR)
-C_SRC_OUTPUT ?= $(CURDIR)/../priv/$(PROJECT).so
+C_SRC_OUTPUT ?= $(CURDIR)/../priv/uart_drv.so
 
 # System type and C compiler/flags.
 
@@ -56,7 +64,7 @@ COMPILE_CPP = $(cpp_verbose) $(CXX) $(CXXFLAGS) $(CPPFLAGS) -c
 
 $(C_SRC_OUTPUT): $(OBJECTS)
 	@mkdir -p $(BASEDIR)/priv/
-	$(link_verbose) $(CC) $(OBJECTS) $(LDFLAGS) $(LDLIBS) -o $(C_SRC_OUTPUT)
+	$(link_verbose) $(CC) $(OBJECTS) $(DTHREAD_DRV_OBJS) $(LDFLAGS) $(LDLIBS) -o $(C_SRC_OUTPUT)
 
 %.o: %.c
 	$(COMPILE_C) $(OUTPUT_OPTION) $<
